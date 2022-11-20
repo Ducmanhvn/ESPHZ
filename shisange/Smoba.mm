@@ -35,6 +35,7 @@ static float 最新音量;
 static BOOL 物资开关;
 static 最小视图信息 POV;
 static NSString*UDID;
+
 @implementation RAdar : NSObject
 
 +(void)load
@@ -98,33 +99,33 @@ static NSString*UDID;
 -(void)getbaseDict
 {
     @autoreleasepool {
-        auto GWorld = Read_Long(baseAdd+0xA2BB4A8);
-        auto ULevel = Read_Long(GWorld + 0x90);
-        auto ActorArray = Read_Long(ULevel + 0xA0);
-        auto ActorCount = Read_Int(ULevel + 0xA8);
+        auto GWorld = DUSWRGHGEWF<long>(baseAdd+0xA2BB4A8);
+        auto ULevel = DUSWRGHGEWF<long>(GWorld + 0x90);
+        auto ActorArray = DUSWRGHGEWF<long>(ULevel + 0xA0);
+        auto ActorCount = DUSWRGHGEWF<int>(ULevel + 0xA8);
         int 队友排序=1;
         NSMutableArray *敌人数组 = @[].mutableCopy;
         for (int i = 0; i < ActorCount; i++) {
-            long base = Read_Long(ActorArray + i * 8);
-            long nameId = Read_Long(baseAdd + 0x604);
-            float hpmax = Read_Float(baseAdd + 0xcf8);
+            long base = DUSWRGHGEWF<long>(ActorArray + i * 8);
+            long nameId = DUSWRGHGEWF<long>(base + 0x604);
+            float hpmax = DUSWRGHGEWF<float>(base + 0xcf8);
             if(hpmax == 100 || hpmax == 110 || hpmax == 120 || hpmax == 130 || hpmax == 140 || hpmax == 150 || hpmax == 160 || hpmax == 170 || hpmax == 180 || hpmax == 190 || hpmax == 200 || nameId == 1){
                 //排除死亡
-                int bDead = Read_Int(base+0xd58);
+                int bDead = DUSWRGHGEWF<int>(base+0xd58);
                 if (bDead != 2) continue;
-                float 血量 = Read_Float(base + 0xcf0);
-                int 人机 = Read_Int(base + 0xA14);
-               
-                auto NetDriver = Read_Long(GWorld + 0x98);
-                auto ServerConnection = Read_Long(NetDriver + 0x78);
-                long localPlayerController = Read_Long(ServerConnection + 0x30);
-                long playerCameraManager = Read_Long(localPlayerController + 0x5a0);
-                int duibiao = Read_Int(base+0x9F8);
+                float 血量 = DUSWRGHGEWF<float>(base + 0xcf0);
+                int 人机 = DUSWRGHGEWF<int>(base + 0xA14);
+                
+                auto NetDriver = DUSWRGHGEWF<long>(GWorld + 0x98);
+                auto ServerConnection = DUSWRGHGEWF<long>(NetDriver + 0x78);
+                long localPlayerController = DUSWRGHGEWF<long>(ServerConnection + 0x30);
+                long playerCameraManager = DUSWRGHGEWF<long>(localPlayerController + 0x5a0);
+                int duibiao = DUSWRGHGEWF<int>(base+0x9F8);
                 if (duibiao == -1) continue;
-                long 名称指针 = Read_Long(base + 0x988);
+                long 名称指针 = DUSWRGHGEWF<long>(base + 0x988);
                 UTF8 玩家名字[32] = "";
                 UTF16 buf16[16] = {0};
-                Read_Data(名称指针, 28, buf16);
+                Read_Data(名称指针,28, buf16);
                 Utf16_To_Utf8(buf16, 玩家名字, 28, strictConversion);
                 NSString*MingZhi = [NSString stringWithUTF8String:(const char *)玩家名字];
                 if (自己名字==nil) {
@@ -147,7 +148,7 @@ static NSString*UDID;
                 //骨骼
                 auto mesh = DUSWRGHGEWF<long>(base + 0x598);
                 转换 meshTrans = DUSWRGHGEWF<转换>(mesh + 0x1b0);
-                矩阵 c2wMatrix = TransformToMatrix(meshTrans);
+                矩阵 c2wMatrix = TransformToMatrix(meshTrans,POV);
                 auto boneArray = DUSWRGHGEWF<long>(mesh + 0x6e0);
                 VV3 头 = gsjs(boneArray + 288, c2wMatrix);
                 float toux= 世界坐标转屏幕坐标(头).X;

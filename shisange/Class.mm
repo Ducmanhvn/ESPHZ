@@ -73,39 +73,13 @@ bool Read_Data(long Src,int Size,void* Dst)
    
 }
 
-long Read_Long(long src)
-{
-    long Buff=0;
-    Read_Data(src,8,&Buff);
-    return Buff;
-}
-
-int Read_Int(long src)
-{
-    int Buff=0;
-    Read_Data(src,4,&Buff);
-    return Buff;
-}
-
-int Read_Short(long src)
-{
-    int Buff=0;
-    Read_Data(src,2,&Buff);
-    return Buff;
-}
-
-float Read_Float(long src)
-{
-    float Buff=0;
-    Read_Data(src,4,&Buff);
-    return Buff;
-}
 template<typename T> T DUSWRGHGEWF(long address) {
     T data;
     Read_Data(address, sizeof(T),reinterpret_cast<void *>(&data));
     return data;
 }
 #pragma mark 矩阵到向量
+static 最小视图信息 POV;
 VV3 MatrixToVector(矩阵 matrix) {
     @autoreleasepool {
         
@@ -129,10 +103,10 @@ VV3 MatrixToVector(矩阵 matrix) {
     
 }
 #pragma mark 变换矩阵
-矩阵 TransformToMatrix(转换 transform) {
+矩阵 TransformToMatrix(转换 transform ,最小视图信息 STPOV) {
     @autoreleasepool {
+        POV=STPOV;
         矩阵 matrix;
-        
         matrix[3][0] = transform.Translation.X;
         matrix[3][1] = transform.Translation.Y;
         matrix[3][2] = transform.Translation.Z;
@@ -214,7 +188,6 @@ VV3 MatrixToVector(矩阵 matrix) {
     
 }
 #pragma mark 世界坐标转屏幕坐标
-最小视图信息 POV;
 VVV2 世界坐标转屏幕坐标(VV3 worldLocation) {
     @autoreleasepool {
         矩阵 tempMatrix = RotatorToMatrix(POV.Rotation);
@@ -245,7 +218,7 @@ VVV2 世界坐标转屏幕坐标(VV3 worldLocation) {
 VV3 gsjs(long boneTransAddr, 矩阵 c2wMatrix){
     @autoreleasepool {
         转换 boneTrans = DUSWRGHGEWF<转换>(boneTransAddr);
-        矩阵 boneMatrix = TransformToMatrix(boneTrans);
+        矩阵 boneMatrix = TransformToMatrix(boneTrans,POV);
         return MatrixToVector(MatrixMulti(boneMatrix, c2wMatrix));
     }
     

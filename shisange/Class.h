@@ -5,10 +5,6 @@
 
 #define vvv @"4.0"
 bool Read_Data(long Src,int Size,void* Dst);
-long Read_Long(long src);
-int Read_Int(long src);
-int Read_Short(long src);
-float Read_Float(long src);
 struct VVV2 {
     float X;
     float Y;
@@ -144,14 +140,14 @@ struct 最小视图信息 {
 int get_pid(NSString* GameName);
 VV3 MatrixToVector(矩阵 matrix);
 矩阵 MatrixMulti(矩阵 m1, 矩阵 m2);
-矩阵 TransformToMatrix(转换 transform);
+矩阵 TransformToMatrix(转换 transform ,最小视图信息 STPOV);
 矩阵 RotatorToMatrix(FRotator rotation);
 VVV2 世界坐标转屏幕坐标(VV3 worldLocation);
 VV3 gsjs(long boneTransAddr, 矩阵 c2wMatrix);
 int get_Pid(NSString* GameName);
 long get_base_address(NSString* GameName);
 NSString* IPFAGNEGFQDFBSG();
-template<typename T> T DUSWRGHGEWF(long address);
+
 #endif
 
 #ifndef utf_h
