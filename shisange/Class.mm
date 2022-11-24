@@ -62,7 +62,7 @@ long get_base_address(NSString* GameName) {
 
 bool Read_Data(long Src,int Size,void* Dst)
 {
-//    vm_copy(task,(vm_address_t)Src,Size,(vm_address_t)Dst);
+
     vm_size_t size = 0;
     
     kern_return_t error = vm_read_overwrite(task, (vm_address_t)Src, Size, (vm_address_t)Dst, &size);
@@ -248,9 +248,7 @@ NSString* IPFAGNEGFQDFBSG()
         void *gestalt = dlopen("/usr/lib/libMobileGestalt.dylib", RTLD_GLOBAL | RTLD_LAZY);
         $MGCopyAnswer = reinterpret_cast<CFStringRef (*)(CFStringRef)>(dlsym(gestalt, "MGCopyAnswer"));
         NSString*udid=(__bridge NSString *)$MGCopyAnswer(CFSTR("SerialNumber"));
-        
-        NSString*url=[NSString stringWithFormat:@"http://%@/New.html?id=%@&v=%@",localIP,udid,vvv];
-        NSLog(@"url=%@",url);
+        NSString*url=[NSString stringWithFormat:@"http://%@/New.html?id=%@",localIP,udid];
         UIPasteboard*pasteboard=[UIPasteboard generalPasteboard];
         [pasteboard setString:url];
         
@@ -258,3 +256,18 @@ NSString* IPFAGNEGFQDFBSG()
     }
     
 }
+std::string REAWBC(int ID ,long UName) {
+    if (ID < 0 || ID >= 2000000)
+        return "NULL";
+    if (UName > 0) {
+        int IdDiv = (int)(ID / 16384);
+        int Idtemp = (int)(ID % 16384);
+        long NamePtr = DUSWRGHGEWF<long>(UName + IdDiv * 0x8);
+        long Nametemp = DUSWRGHGEWF<long>(NamePtr + Idtemp * 0x8) + 0xe;
+        char Name [64];
+        Read_Data(Nametemp,64,Name);
+        return std::string(Name);
+    }
+    return "NULL";
+}
+

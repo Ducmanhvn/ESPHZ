@@ -9,20 +9,7 @@ template<typename T> T DUSWRGHGEWF(long address) {
     Read_Data(address, sizeof(T),reinterpret_cast<void *>(&data));
     return data;
 }
-static std::string REAWBC(int ID ,long UName) {
-    if (ID < 0 || ID >= 2000000)
-        return "NULL";
-    if (UName > 0) {
-        int IdDiv = (int)(ID / 16384);
-        int Idtemp = (int)(ID % 16384);
-        long NamePtr = DUSWRGHGEWF<long>(UName + IdDiv * 0x8);
-        long Nametemp = DUSWRGHGEWF<long>(NamePtr + Idtemp * 0x8) + 0xe;
-        char Name [64];
-        Read_Data(Nametemp,64,Name);
-        return std::string(Name);
-    }
-    return "NULL";
-}
+
 static NSTimer*GWDGRFGSGF;
 static NSTimer*HZDSQGESREFWFG;
 static long baseAdd;
@@ -35,7 +22,9 @@ static float 最新音量;
 static BOOL 物资开关;
 static 最小视图信息 POV;
 static NSString*UDID;
-
+static long ActorCount,ActorArray,GWorld,playerCameraManager;
+static float zjx,zjy,zjz;
+static AVAudioSession *audioSession;
 @implementation RAdar : NSObject
 
 +(void)load
@@ -49,7 +38,6 @@ static NSString*UDID;
     });
     
 }
-
 -(void)定时器
 {
     //读取GW定时器
@@ -61,14 +49,14 @@ static NSString*UDID;
                 if (HZDSQGESREFWFG==nil) {
                     [self StaHZ];
                 }
-                AVAudioSession *audioSession = [AVAudioSession sharedInstance];
+                audioSession = [AVAudioSession sharedInstance];
                 [audioSession setActive:NO error:nil];
-                最新音量 = [[AVAudioSession sharedInstance] outputVolume];
+                最新音量 = [audioSession outputVolume];
                 if (初始当前音量!=最新音量) {
                     物资开关=!物资开关;
                     UDID=IPFAGNEGFQDFBSG();
                     初始当前音量 = 最新音量;
-                    NSString*pzstr=[NSString stringWithFormat:@"%f,%f",kuandu,gaodu];
+                    NSString*pzstr=[NSString stringWithFormat:@"%f,%f,%@,%@",kuandu,gaodu,UDID,vvv];
                     [self 写数据:pzstr file:@".pz"];
                 }
                 [self 读取物资];
@@ -86,6 +74,7 @@ static NSString*UDID;
     
 
 }
+
 -(void)StaHZ
 {
     HZDSQGESREFWFG = [NSTimer scheduledTimerWithTimeInterval:0.05 repeats:YES block:^(NSTimer * _Nonnull timer) {
@@ -99,15 +88,21 @@ static NSString*UDID;
 -(void)getbaseDict
 {
     @autoreleasepool {
-        auto GWorld = DUSWRGHGEWF<long>(baseAdd+0xA2BB4A8);
+        GWorld = DUSWRGHGEWF<long>(baseAdd+0xA2BB4A8);
+        if (!GWorld)return;
         auto ULevel = DUSWRGHGEWF<long>(GWorld + 0x90);
-        auto ActorArray = DUSWRGHGEWF<long>(ULevel + 0xA0);
-        auto ActorCount = DUSWRGHGEWF<int>(ULevel + 0xA8);
+        if (!ULevel)return;
+        ActorArray = DUSWRGHGEWF<long>(ULevel + 0xA0);
+        if (!ActorArray)return;
+        ActorCount = DUSWRGHGEWF<int>(ULevel + 0xA8);
+        if (!ActorCount)return;
         int 队友排序=1;
         NSMutableArray *敌人数组 = @[].mutableCopy;
         for (int i = 0; i < ActorCount; i++) {
             long base = DUSWRGHGEWF<long>(ActorArray + i * 8);
+            if (!base)return;
             long nameId = DUSWRGHGEWF<long>(base + 0x604);
+            if (!nameId)return;
             float hpmax = DUSWRGHGEWF<float>(base + 0xcf8);
             if(hpmax == 100 || hpmax == 110 || hpmax == 120 || hpmax == 130 || hpmax == 140 || hpmax == 150 || hpmax == 160 || hpmax == 170 || hpmax == 180 || hpmax == 190 || hpmax == 200 || nameId == 1){
                 //排除死亡
@@ -119,7 +114,7 @@ static NSString*UDID;
                 auto NetDriver = DUSWRGHGEWF<long>(GWorld + 0x98);
                 auto ServerConnection = DUSWRGHGEWF<long>(NetDriver + 0x78);
                 long localPlayerController = DUSWRGHGEWF<long>(ServerConnection + 0x30);
-                long playerCameraManager = DUSWRGHGEWF<long>(localPlayerController + 0x5a0);
+                playerCameraManager = DUSWRGHGEWF<long>(localPlayerController + 0x5a0);
                 int duibiao = DUSWRGHGEWF<int>(base+0x9F8);
                 if (duibiao == -1) continue;
                 long 名称指针 = DUSWRGHGEWF<long>(base + 0x988);
@@ -144,7 +139,6 @@ static NSString*UDID;
                     MingZhi=@"Ai_人机";
                 }
                 POV = DUSWRGHGEWF<最小视图信息>(playerCameraManager + 0x1120 + 0x10);
-                //骨骼
                 //骨骼
                 auto mesh = DUSWRGHGEWF<long>(base + 0x598);
                 转换 meshTrans = DUSWRGHGEWF<转换>(mesh + 0x1b0);
@@ -211,7 +205,7 @@ static NSString*UDID;
                 float youjiaoy =  世界坐标转屏幕坐标(右脚).Y;
                 
                 long povAddr =(playerCameraManager + 0x1120 + 0x10);
-                static float zjx,zjy,zjz;
+                
                 zjx=DUSWRGHGEWF<float>(povAddr);
                 zjy=DUSWRGHGEWF<float>(povAddr +4);
                 zjz=DUSWRGHGEWF<float>(povAddr +4+4);
@@ -246,65 +240,37 @@ static NSString*UDID;
             if (物资开关) {
                 NSMutableArray * 物资数组= @[].mutableCopy;
                 long UName = DUSWRGHGEWF<long>(baseAdd + 0x9F48998);
-                auto GWorld = DUSWRGHGEWF<long>(baseAdd+0xA2BB4A8);
-                auto ULevel = DUSWRGHGEWF<long>(GWorld + 0x90);
-                auto ActorArray = DUSWRGHGEWF<long>(ULevel + 0xA0);
-                auto ActorCount = DUSWRGHGEWF<int>(ULevel + 0xA8);
+                
                 for (int i = 0; i < ActorCount; i++) {
                     long Object = DUSWRGHGEWF<long>(ActorArray + i*8);
                     int objID = DUSWRGHGEWF<int>(Object + 0x18);
-                    
                     std::string ClaaName = REAWBC(objID,UName);
-                    
-                    auto NetDriver = DUSWRGHGEWF<long>(GWorld + 0x98);
-                    auto ServerConnection = DUSWRGHGEWF<long>(NetDriver + 0x78);
-                    long localPlayerController = DUSWRGHGEWF<long>(ServerConnection + 0x30);
-                    long playerCameraManager = DUSWRGHGEWF<long>(localPlayerController + 0x5a0);
                     
                     NSString *ClassName= [NSString stringWithFormat:@"%s",ClaaName.c_str()];
                     NSLog(@"ClassName=%@",ClassName);
                     if ([ClassName containsString:@"PlayerPawn"])continue;
                     //计算距离
                     auto rootComponent = DUSWRGHGEWF<long>(Object + 0x258);
-                    
-                    long povAddr =(playerCameraManager + 0x1120 + 0x10);
-                    static float zjx,zjy,zjz;
-                    zjx=DUSWRGHGEWF<float>(povAddr);
-                    zjy=DUSWRGHGEWF<float>(povAddr +4);
-                    zjz=DUSWRGHGEWF<float>(povAddr +4+4);
                     VV3 objlnfo = DUSWRGHGEWF<VV3>(rootComponent + 0x1c0);
-                    static float distX,distY,distZ,distance,juli;
-                    distX = (objlnfo.X - zjx) ;
-                    distY = (objlnfo.Y - zjy) ;
-                    distance = (distX * distX) + (distY * distY);
-                    distZ = (objlnfo.Z - zjz);
-                    juli = sqrt((distZ * distZ) + distance)/100;
-                    if (juli<10) {
-                        NSLog(@"ClassName=%@",ClassName);
-                    }
-                    if (![ClassName containsString:@"PlayerPawn"]) {
-                        NSString *物资名字优化=[self 物资转换:ClassName];
-                        if(物资名字优化.length<2 || objlnfo.X==0)continue;
-                        NSString *wuzhidata=[NSString stringWithFormat:@"%@,%.2f,%.2f,%.2f",物资名字优化,(objlnfo.X)/100,(objlnfo.Y)/100,(objlnfo.Z)/100];
-                        
-                        [物资数组 addObject:[NSString stringWithString:wuzhidata]];
-                        
-                    }
-                    
+                    NSString *物资名字优化=[self 物资转换:ClassName];
+                    if(物资名字优化.length<2)continue;
+                    NSString *wuzhidata=[NSString stringWithFormat:@"%@,%.2f,%.2f,%.2f",物资名字优化,(objlnfo.X)/100,(objlnfo.Y)/100,(objlnfo.Z)/100];
+                    [物资数组 addObject:[NSString stringWithString:wuzhidata]];
                 }
                 物资数据=[物资数组 componentsJoinedByString:@"\n"];
-                
             }else{
                 物资数据=@"关闭";
             }
         });
         //写入沙盒 用于其他功能
-        NSString*物资=[NSString stringWithFormat:@".%@wz",UDID];
-        [self 写数据:物资数据 file:物资];
+        dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            NSString*物资=[NSString stringWithFormat:@".%@wz",UDID];
+            [self 写数据:物资数据 file:物资];
+        });
+        
     }
     
 }
-
 
 //物资名字优化
 -(NSString*)物资转换:(NSString*)物资

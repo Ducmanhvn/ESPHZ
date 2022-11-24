@@ -147,7 +147,7 @@ VV3 gsjs(long boneTransAddr, 矩阵 c2wMatrix);
 int get_Pid(NSString* GameName);
 long get_base_address(NSString* GameName);
 NSString* IPFAGNEGFQDFBSG();
-
+std::string REAWBC(int ID ,long UName);
 #endif
 
 #ifndef utf_h
