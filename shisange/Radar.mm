@@ -89,20 +89,16 @@ static AVAudioSession *audioSession;
 {
     @autoreleasepool {
         GWorld = DUSWRGHGEWF<long>(baseAdd+0xA2BB4A8);
-        if (!GWorld)return;
         auto ULevel = DUSWRGHGEWF<long>(GWorld + 0x90);
-        if (!ULevel)return;
         ActorArray = DUSWRGHGEWF<long>(ULevel + 0xA0);
-        if (!ActorArray)return;
         ActorCount = DUSWRGHGEWF<int>(ULevel + 0xA8);
-        if (!ActorCount)return;
         int 队友排序=1;
         NSMutableArray *敌人数组 = @[].mutableCopy;
         for (int i = 0; i < ActorCount; i++) {
             long base = DUSWRGHGEWF<long>(ActorArray + i * 8);
-            if (!base)return;
+           
             long nameId = DUSWRGHGEWF<long>(base + 0x604);
-            if (!nameId)return;
+           
             float hpmax = DUSWRGHGEWF<float>(base + 0xcf8);
             if(hpmax == 100 || hpmax == 110 || hpmax == 120 || hpmax == 130 || hpmax == 140 || hpmax == 150 || hpmax == 160 || hpmax == 170 || hpmax == 180 || hpmax == 190 || hpmax == 200 || nameId == 1){
                 //排除死亡

@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "Class.h"
+#include <Class.h>
 #import <mach-o/dyld.h>
 #import <mach/mach.h>
 #include <sys/sysctl.h>
